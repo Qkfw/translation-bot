@@ -1,4 +1,5 @@
 import { BotType } from '../type'
+import { GTR } from '../lib/translation'
 
 export function start(this: BotType) {
   this.command('start', async (ctx) => await ctx.reply('Hello, World!'))
@@ -11,5 +12,20 @@ export function reply_dc(this: BotType) {
     await ctx.reply('#DC老湿犯病计数器', {
       reply_to_message_id: ctx.message.message_id,
     })
+  })
+}
+
+export function echo(this: BotType) {
+  this.on('message:text', async (ctx) => {
+    await ctx.reply(ctx.message.text)
+  })
+}
+
+export function translate_message(this: BotType) {
+  const gtr = new GTR()
+  this.on('message:text', async (ctx) => {
+    const text = ctx.message.text
+    const { trans } = await gtr.translate(text, { targetLang: 'en' })
+    await ctx.reply(trans, { reply_to_message_id: ctx.message.message_id })
   })
 }
