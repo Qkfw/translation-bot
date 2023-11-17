@@ -29,3 +29,22 @@ export function translate_message(this: BotType) {
     await ctx.reply(trans, { reply_to_message_id: ctx.message.message_id })
   })
 }
+
+export function clear_bilibili_tracked(this: BotType) {
+  this.on('message:entities:url', async (ctx) => {
+    const links = ctx.entities('url')
+    let message = ctx.message.text
+    links.forEach(({ text }) => {
+      const search = new URL(text).search
+      message = message.replace(search, '')
+    })
+    await ctx.reply(message, {
+      reply_to_message_id: ctx.message.message_id,
+    })
+    try {
+      await ctx.deleteMessage()
+    } catch (e) {
+      console.error(e)
+    }
+  })
+}

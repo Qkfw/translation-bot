@@ -4,7 +4,7 @@ import { controller } from './controller'
 
 const instance = controller(bot)
 instance.start()
-// instance.reply_dc()
+instance.clear_bilibili_tracked()
 instance.translate_message()
 
 export const config = { runtime: 'edge' }
