@@ -34,10 +34,19 @@ export function clear_bilibili_tracked(this: BotType) {
   this.on('message:entities:url', async (ctx) => {
     const links = ctx.entities('url')
     let message = ctx.message.text
-    links.forEach(({ text }) => {
-      const search = new URL(text).search
-      message = message.replace(search, '')
-    })
+
+    for (const { text } of links) {
+      let source = text
+      if (text.includes('b23.tv')) {
+        const res = await fetch(text, { redirect: 'manual' })
+        source = res.headers.get('location') ?? 'undefined'
+      }
+
+      const search = new URL(source).search
+      source = source.replace(search, '') // remove search params
+      message = message.replace(text, source) // replace url
+    }
+
     await ctx.reply(message, {
       reply_to_message_id: ctx.message.message_id,
     })
