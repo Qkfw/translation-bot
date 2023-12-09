@@ -33,9 +33,12 @@ export function translate_message(this: BotType) {
 export function clear_bilibili_tracked(this: BotType) {
   this.on('message:entities:url', async (ctx) => {
     const links = ctx.entities('url')
-    let message = ctx.message.text
+    let message = ctx.message.text,
+      hasBilibili = false
 
     for (const { text } of links) {
+      if (!text.includes('b23.tv') && !text.includes('bilibili.com')) continue
+      hasBilibili = true
       let source = text
       if (text.includes('b23.tv')) {
         const res = await fetch(text, { redirect: 'manual' })
@@ -46,11 +49,12 @@ export function clear_bilibili_tracked(this: BotType) {
       source = source.replace(search, '') // remove search params
       message = message.replace(text, source) // replace url
     }
-
-    await ctx.reply(message, {
-      reply_to_message_id: ctx.message.message_id,
-    })
     try {
+      // 没有跟踪链接就直接返回
+      if (!hasBilibili) return
+      await ctx.reply(message, {
+        reply_to_message_id: ctx.message.message_id,
+      })
       await ctx.deleteMessage()
     } catch (e) {
       console.error(e)
