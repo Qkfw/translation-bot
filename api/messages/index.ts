@@ -1,5 +1,5 @@
 import { BotType } from '../type'
-import { GTR } from '../lib/translation'
+import { type ResponseData, Translator } from '@fwqaaq/translator'
 
 export function start(this: BotType) {
   this.command('start', async (ctx) => await ctx.reply('Hello, World!'))
@@ -22,10 +22,10 @@ export function echo(this: BotType) {
 }
 
 export function translate_message(this: BotType) {
-  const gtr = new GTR()
+  const t = new Translator()
   this.on('message:text', async (ctx) => {
     const text = ctx.message.text
-    const { trans } = await gtr.translate(text, { targetLang: 'en' })
+    const { text: trans } = (await t.translate(text)) as ResponseData
     await ctx.reply(trans, { reply_to_message_id: ctx.message.message_id })
   })
 }
